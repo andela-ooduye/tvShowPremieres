@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TV Series Premieres</title>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.27/angular.min.js"></script>
+    <script src="https://rawgithub.com/gsklee/ngStorage/master/ngStorage.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/tvShowController.js"></script>
+  </head>
+  <body ng-app="tvShowApp" ng-controller="MainController">
+    <div class="jumbotron">
+      <div class="container">
+        <h1>TV SHOWS PREMIERES</h1>
+      </div>
+    </div>
+      <!-- Container that holds the content of the view -->
+    <div class="container" >
+      <div class="row searchBar">
+        <div class="col-lg-6">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search for..." ng-model="searchFilter">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button">Search</button>
+            </span>
+          </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+        <!-- Button to trigger the Add TV Show Modal --> 
+        <div class="col-md-6 addSeriesBtn"><button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#addModal">Add TV Show</button></div>
+      </div> 
+        <!-- Display for all the data stored in the Local Storage -->
+      <div class="row" ng-repeat="data in messages | filter:searchFilter | orderBy: '-showRating'">
+        <div class="col-md-9 property">
+          <div class="media-left media-middle">
+            <a href="#">
+              <img class="media-object" ng-src="{{data.imageURL}}" alt="...">
+            </a>
+          </div>
+          <div class="media-body">
+            <h3 class="media-heading"><strong>{{data.title | uppercase}}</strong></h3>
+           {{data.plot}}
+          </div>
+        </div>
+        <div class="col-md-3 propertyClass">
+          Day shown: {{data.showDate}}<br/>
+          TV Station: {{data.stationShown}}<br/>
+          Season: {{data.showSeason}}<br/>
+          Genre: {{data.showGenre}}<br/>
+          Rating: {{data.showRating}}<br/>
+          <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#editModal" ng-click="edit(data.position)">Edit</button>
+          <button type="button" class="btn btn-danger btn-sm" ng-click="delete(data.position)">Delete</button>
+        </div>
+      </div>
+    </div>
+
+     <!-- Modal to add new TV Show-->
+    <div id="addModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" id="closeAddModal" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Add a new TV Show</h4>
+          </div>
+          <div class="modal-body">
+            <form ng-submit="save()">
+              <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" id="title" placeholder="Enter TV Show Title" ng-model="store.title">
+              </div>
+              <div class="form-group">
+                <label for="imageLink">Image URL</label>
+                <input type="text" class="form-control" id="imageLink" placeholder="Enter the URL link of the TV Show's picture" ng-model="store.imageURL">
+              </div>
+              <div class="form-group">
+                <label for="plot">Plot</label>
+                <textarea class="form-control" id="plot" placeholder="Plot of TV Show" ng-model="store.plot"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="dateShown">Day Shown</label>
+                <select class="form-control" id="dateShown" ng-model="store.showDate">
+                  <option>Sundays</option>
+                  <option>Mondays</option>
+                  <option>Tuesdays</option>
+                  <option>Wednesdays</option>
+                  <option>Thursdays</option>
+                  <option>Fridays</option>
+                  <option>Saturdays</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="stationShown">TV Station</label>
+                <input type="text" class="form-control" id="stationShown" placeholder="Station showing TV Show" ng-model="store.stationShown">
+              </div>
+              <div class="form-group">
+                <label for="seasonOfShow">Season</label>
+                <input type="text" class="form-control" id="seasonOfShow" placeholder="Season of TV Show" ng-model="store.showSeason">
+              </div>
+              <div class="form-group">
+                <label for="genreOfShow">Genre</label>
+                <input type="text" class="form-control" id="genreOfShow" placeholder="Genre of TV Show" ng-model="store.showGenre">
+              </div>
+              <div class="form-group">
+                <label for="showRating">Rating</label>
+                <select class="form-control" id="showRating" ng-model="store.showRating">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </div>
+            
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-default" >Submit</button>
+          </form>
+
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+          
+        </div>
+
+      </div>
+    </div>
+
+     <!-- Modal to edit existing TV Show-->
+    <div id="editModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" id="closeEditModal" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Edit a TV Show</h4>
+          </div>
+          <div class="modal-body">
+            <form ng-submit="saveEdit(index)">
+              <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" id="title" ng-model="editing.title">
+              </div>
+              <div class="form-group">
+                <label for="imageLink">Image URL</label>
+                <input type="text" class="form-control" id="imageLink" placeholder="Enter the URL link of the TV Show's picture" ng-model="editing.imageURL">
+              </div>
+              <div class="form-group">
+                <label for="plot">Plot</label>
+                <textarea class="form-control" id="plot" placeholder="Plot of TV Show" ng-model="editing.plot"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="dateShown">Day Shown</label>
+                <select class="form-control" id="dateShown" ng-model="editing.showDate">
+                  <option>Sundays</option>
+                  <option>Mondays</option>
+                  <option>Tuesdays</option>
+                  <option>Wednesdays</option>
+                  <option>Thursdays</option>
+                  <option>Fridays</option>
+                  <option>Saturdays</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="stationShown">TV Station</label>
+                <input type="text" class="form-control" id="stationShown" placeholder="Station showing TV Show" ng-model="editing.stationShown">
+              </div>
+              <div class="form-group">
+                <label for="seasonOfShow">Season</label>
+                <input type="text" class="form-control" id="seasonOfShow" placeholder="Season of TV Show" ng-model="editing.showSeason">
+              </div>
+              <div class="form-group">
+                <label for="genreOfShow">Genre</label>
+                <input type="text" class="form-control" id="genreOfShow" placeholder="Genre of TV Show" ng-model="editing.showGenre">
+              </div>
+              <div class="form-group">
+                <label for="showRating">Rating</label>
+                <select class="form-control" id="showRating" ng-model="editing.showRating">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </div>
+            
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-default" >Submit</button>
+          </form>
+
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+          
+        </div>
+
+      </div>
+    </div>
+
+
+  </body>
+</html>
+
